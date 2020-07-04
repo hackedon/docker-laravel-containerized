@@ -3,10 +3,14 @@ version: '3'
 networks:
   patch-api:
 
+volumes:
+  db_data: {}
+
 services:
   nginx:
     container_name: nginx
     tty: false
+    restart: always
     build:
       context: ./nginx
     volumes:
@@ -21,6 +25,7 @@ services:
   php:
     container_name: php
     tty: true
+    restart: always
     build:
       context: ./php
     volumes:
@@ -37,6 +42,7 @@ services:
   mysql:
     image: mysql:5.7
     container_name: mysql
+    restart: always
     tty: false
     environment:
       MYSQL_DATABASE: patch-api-db
@@ -44,7 +50,7 @@ services:
       MYSQL_PASSWORD: secret
       MYSQL_ROOT_PASSWORD: secret
     volumes:
-      - ./mysql/data:/var/lib/mysql
+      - db_data:/var/lib/mysql
     ports:
       - "3306"
     networks:
@@ -53,6 +59,7 @@ services:
   redis:
     image: redis:6.0-alpine
     container_name: redis
+    restart: always
     tty: false
     ports:
       - "6379"
@@ -64,6 +71,9 @@ services:
       context: ./worker
     container_name: worker
     tty: true
+    depends_on:
+      - mysql
+      - redis
     volumes:
       - ${LOCAL_PROJECT_PATH}:/app
     working_dir: /app
@@ -76,6 +86,9 @@ services:
       context: ./scheduler
     container_name: scheduler
     tty: true
+    depends_on:
+      - mysql
+      - redis
     volumes:
       - ${LOCAL_PROJECT_PATH}:/app
     working_dir: /app
