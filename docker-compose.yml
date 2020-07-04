@@ -67,6 +67,21 @@ services:
     networks:
       - patch-api
 
+  horizon-worker:
+    build:
+      context: ./horizon-worker
+    container_name: horizon-worker
+    tty: true
+    depends_on:
+      - mysql
+      - redis
+    volumes:
+      - ${LOCAL_PROJECT_PATH}:/app
+    working_dir: /app
+    networks:
+      - patch-api
+    command: ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf", "-u", "root", "-j", "/supervisord.pid", "-l", "/horizon-worker.log"]
+
   worker:
     build:
       context: ./worker
