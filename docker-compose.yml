@@ -9,8 +9,7 @@ volumes:
 services:
   nginx:
     container_name: nginx
-    tty: false
-    restart: always
+    restart: on-failure
     build:
       context: ./nginx
     volumes:
@@ -24,8 +23,7 @@ services:
 
   php:
     container_name: php
-    tty: true
-    restart: always
+    restart: on-failure
     build:
       context: ./php
     volumes:
@@ -34,8 +32,8 @@ services:
     depends_on:
       - mysql
       - redis
-    ports:
-      - "9000:9000"
+    expose:
+      - "9000"
     networks:
       - patch-api
     command: ["php-fpm","-R"]
@@ -43,8 +41,7 @@ services:
   mysql:
     image: mysql:5.7
     container_name: mysql
-    restart: always
-    tty: false
+    restart: on-failure
     environment:
       MYSQL_DATABASE: patch-api-db
       MYSQL_USER: patch-api-user
@@ -53,16 +50,15 @@ services:
     volumes:
       - db_data:/var/lib/mysql
     ports:
-      - "3306"
+      - "33060:3306"
     networks:
       - patch-api
 
   redis:
     image: redis:6.0-alpine
     container_name: redis
-    restart: always
-    tty: false
-    ports:
+    restart: on-failure
+    expose:
       - "6379"
     networks:
       - patch-api
@@ -71,7 +67,7 @@ services:
     build:
       context: ./horizon-worker
     container_name: horizon-worker
-    tty: true
+    restart: on-failure
     depends_on:
       - mysql
       - redis
@@ -86,7 +82,7 @@ services:
     build:
       context: ./worker
     container_name: worker
-    tty: true
+    restart: on-failure
     depends_on:
       - mysql
       - redis
@@ -101,7 +97,7 @@ services:
     build:
       context: ./scheduler
     container_name: scheduler
-    tty: true
+    restart: on-failure
     depends_on:
       - mysql
       - redis
