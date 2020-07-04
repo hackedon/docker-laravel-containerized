@@ -8,3 +8,8 @@ RUN docker-php-ext-install mysqli pdo pdo_mysql
 RUN apt update && apt install -y supervisor
 COPY supervisord.conf /etc/supervisor/supervisord.conf
 COPY laravel-worker.conf /etc/supervisor/conf.d/laravel-worker.conf
+
+# Clean up
+RUN apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    rm /var/log/lastlog /var/log/faillog
