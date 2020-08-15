@@ -99,21 +99,6 @@ services:
       - patch-api
     command: ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf", "-u", "root", "-j", "/supervisord.pid", "-l", "/horizon-worker.log"]
 
-  #  worker:
-  #    build:
-  #      context: ./worker
-  #    container_name: worker
-  #    restart: on-failure
-  #    depends_on:
-  #      - mysql
-  #      - redis
-  #    volumes:
-  #      - ${LOCAL_PROJECT_PATH}:/app
-  #    working_dir: /app
-  #    networks:
-  #      - patch-api
-  #    command: ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf", "-u", "root", "-j", "/supervisord.pid", "-l", "/worker.log"]
-
   scheduler:
     build:
       context: ./scheduler
@@ -137,6 +122,8 @@ services:
     depends_on:
       - php-1
       - php-2
+    volumes:
+      - ${LOCAL_PROJECT_PATH}:/app
     working_dir: /app
     networks:
       - patch-api
